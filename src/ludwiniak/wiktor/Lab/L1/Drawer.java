@@ -25,16 +25,7 @@ public class Drawer {
             return;
         }
 
-        for (int i = 1; i <= size; i++) {
-            for (int j = 1; j <= size; j++) {
-                if (i == 1 || i == size || j == 1 || j == size) {
-                    printSymbol();
-                } else {
-                    printSeparator();
-                }
-            }
-            printNewLine();
-        }
+        drawRectangle(size, size);
     }
 
     public static void drawPyramid(int size) {
@@ -42,25 +33,21 @@ public class Drawer {
             printError();
             return;
         }
-
-        final int limit = size * 2 - 1;
-
         for (int i = 1; i <= size; i++) {
-            drawPyramidLine(i, limit, size);
+            drawPyramidLine(i, size);
         }
     }
 
-    private static void drawPyramidLine(final int i, final int limit, final int size) {
-        for (int j = 1; j <= limit; j++) {
-            final int border = i - 1;
-            final int symbolLimit = size + border;
+    private static void drawPyramidLine(final int i, final int size) {
+        final int border = i - 1;
+        final int symbolLastIndex = size + border;
+        final int symbolStartIndex = size - border;
 
-            if (j == size || (symbolLimit >= j && size - border <= j)) {
+        for (int j = 1; j <= symbolLastIndex ; j++) {
+            if (symbolStartIndex <= j) {
                 printSymbol();
-            } else if (!(symbolLimit <= j)) {
-                printSeparator();
             } else {
-                break;
+                printSeparator();
             }
         }
         printNewLine();
@@ -73,14 +60,30 @@ public class Drawer {
         }
 
         for (int segmentSize = 1; segmentSize <= size; segmentSize++) {
-            final int limit = segmentSize * 2 - 1;
-
             for (int i = 1; i <= segmentSize; i++) {
                 for (int z = 1; z <= size - segmentSize; z++) {
                     printSeparator();
                 }
-                drawPyramidLine(i, limit, segmentSize);
+                drawPyramidLine(i, segmentSize);
             }
+        }
+    }
+
+    public static void drawRectangle(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            printError();
+            return;
+        }
+
+        for (int row = 1; row <= height; row++) {
+            for (int col = 1; col <= width; col++) {
+                if (row == 1 || row == height || col == 1 || col == width) {
+                    printSymbol();
+                } else {
+                    printSeparator();
+                }
+            }
+            printNewLine();
         }
     }
 

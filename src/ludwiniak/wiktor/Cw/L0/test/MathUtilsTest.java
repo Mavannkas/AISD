@@ -31,7 +31,7 @@ class MathUtilsTest {
     @Test()
     @DisplayName("Check solution for arr1")
     void getSecondSmallest() throws NoAnswerException {
-        int[] input = new int[]{1, 2, 3, 4, 5, 6, 7, 8};
+        int[] input = new int[]{1, 2};
         int output = 2;
 
         Assertions.assertEquals(output, MathUtils.getSecondSmallest(input));
@@ -85,6 +85,14 @@ class MathUtilsTest {
     @DisplayName("Check solution for uniform data")
     void getSecondSmallest3() throws NoAnswerException {
         int[] input = new int[]{1, 1, 1, 1, 1, 1 ,1, 1};
+
+        Assertions.assertThrows(NoAnswerException.class, ()->MathUtils.getSecondSmallest(input));
+    }
+
+    @Test()
+    @DisplayName("Check solution for uniform data")
+    void getSecondSmallest333() throws NoAnswerException {
+        int[] input = new int[]{};
 
         Assertions.assertThrows(NoAnswerException.class, ()->MathUtils.getSecondSmallest(input));
     }

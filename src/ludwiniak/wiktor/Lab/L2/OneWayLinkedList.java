@@ -11,22 +11,24 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class OneWayLinkedList<T> implements IList<T> {
     private LinkedElement<T> first;
-
+    private int length = 0;
     @Override
     public void add(T value) {
+        LinkedElement<T> newElement = new LinkedElement<>(value);
+        length++;
+
         if (isEmpty()) {
-            first = new LinkedElement<>(value);
+            first = newElement;
             return;
         }
 
         AtomicReference<LinkedElement<T>> lastElement = new AtomicReference<>();
-
         goToElementByCallBack(((linkedElement, index) -> {
             lastElement.set(linkedElement);
             return false;
         }));
 
-        lastElement.get().next = new LinkedElement<T>(value);
+        lastElement.get().next = newElement;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class OneWayLinkedList<T> implements IList<T> {
         LinkedElement<T> oldElement;
         LinkedElement<T> element;
 
-        if (index == 0) {
+        if (index == 0 && !isEmpty()) {
             oldElement = first;
             first = new LinkedElement<T>(value);
             first.next = oldElement;
@@ -44,18 +46,19 @@ public class OneWayLinkedList<T> implements IList<T> {
             element.next = new LinkedElement<T>(value);
             element.next.next = oldElement;
         }
+
+        length++;
     }
 
     @Override
     public void clear() {
+        length = 0;
         first = null;
     }
 
     @Override
     public boolean contains(T value) {
-        LinkedElement<T> element = goToElementByCallBack((linkedElement, index) -> value.equals(linkedElement.element));
-
-        return !Objects.isNull(element);
+        return indexOf(value) != -1;
     }
 
     @Override
@@ -64,7 +67,7 @@ public class OneWayLinkedList<T> implements IList<T> {
     }
 
     private LinkedElement<T> getLinkedElement(int index) throws NoSuchElementException {
-        if (size() + 1 < index) { //TODO
+        if (size() + 1 < index || index < 0) { //TODO
             throw new NoSuchElementException();
         }
 
@@ -89,12 +92,31 @@ public class OneWayLinkedList<T> implements IList<T> {
 
     @Override
     public void set(int index, T value) throws NoSuchElementException {
-        // TODO
+        LinkedElement<T> newElement = new LinkedElement<T>(value);
+
+        if (index == 0 && !isEmpty()) {
+            newElement.next = first.next;
+            first = newElement;
+        } else {
+            LinkedElement<T> prevElement = getLinkedElement(index - 1);
+            LinkedElement<T> currentElement = prevElement.next;
+            newElement.next = currentElement.next;
+            prevElement.next = newElement;
+        }
     }
 
     @Override
     public int indexOf(T value) {
-        return 0;
+        AtomicInteger index = new AtomicInteger(-1);
+        LinkedElement<T> element = goToElementByCallBack((linkedElement, currentIndex) -> {
+            if(linkedElement.element == value) {
+                index.set(currentIndex);
+                return true;
+            }
+            return false;
+        });
+
+        return index.get();
     }
 
     @Override
@@ -104,16 +126,20 @@ public class OneWayLinkedList<T> implements IList<T> {
 
     @Override
     public T removeAt(int index) throws NoSuchElementException {
-        return null;
+        return null; //TODO
     }
 
     @Override
     public boolean remove(T value) {
-        return false;
+        return false; //TODO
     }
 
     @Override
     public int size() {
+        return length;
+    }
+
+    public int countSize() {
         AtomicInteger counter = new AtomicInteger(-1);
 
         goToElementByCallBack(((linkedElement, index) -> {
@@ -126,7 +152,10 @@ public class OneWayLinkedList<T> implements IList<T> {
 
     @Override
     public void print() {
-        // TODO: Zaimplementuj wypisanie zawartości listy do konsoli
+        goToElementByCallBack(((linkedElement, index) -> {
+            System.out.printf("%2d %10s\n", index, linkedElement);
+            return false;
+        }));
     }
 
     @Override

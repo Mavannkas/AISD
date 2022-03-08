@@ -119,7 +119,7 @@ public class OneWayLinkedListTests {
     @org.junit.jupiter.api.Test
     void setAtInvalidIndex() {
         assertThrows(NoSuchElementException.class, () -> {
-            list.set(-2, "doesn't matter");
+            list.set(0, "doesn't matter");
         });
     }
 

@@ -1,6 +1,7 @@
 package ludwiniak.wiktor.Lab.L2;
 
 import ludwiniak.wiktor.Lab.L2.helpers.Function2Args;
+import ludwiniak.wiktor.Lab.L2.helpers.Procedure2Args;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -9,9 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 
-public class OneWayLinkedList<T> implements IList<T> {
+public class OneWayLinkedList<T> implements IList<T>, Iterable<T> {
     private LinkedElement<T> first;
     private int length = 0;
+
     @Override
     public void add(T value) {
         LinkedElement<T> newElement = new LinkedElement<>(value);
@@ -23,28 +25,21 @@ public class OneWayLinkedList<T> implements IList<T> {
         }
 
         AtomicReference<LinkedElement<T>> lastElement = new AtomicReference<>();
-        goToElementByCallBack(((linkedElement, index) -> {
-            lastElement.set(linkedElement);
-            return false;
-        }));
+        invokeForAllElements(((linkedElement, index) -> lastElement.set(linkedElement)));
 
         lastElement.get().next = newElement;
     }
 
     @Override
-    public void addAt(int index, T value) throws NoSuchElementException { //TODO refaktor
-        LinkedElement<T> oldElement;
-        LinkedElement<T> element;
-
-        if (index == 0 && !isEmpty()) {
-            oldElement = first;
-            first = new LinkedElement<T>(value);
-            first.next = oldElement;
+    public void addAt(int index, T value) throws NoSuchElementException {
+        LinkedElement<T> newNode = new LinkedElement<T>(value);
+        if (index == 0) {
+            newNode.next = first;
+            first = newNode;
         } else {
-            element = getLinkedElement(index - 1);
-            oldElement = element.next;
-            element.next = new LinkedElement<T>(value);
-            element.next.next = oldElement;
+            LinkedElement<T> element = getLinkedElement(index - 1);
+            newNode.next = element.next;
+            element.next = newNode;
         }
 
         length++;
@@ -67,7 +62,7 @@ public class OneWayLinkedList<T> implements IList<T> {
     }
 
     private LinkedElement<T> getLinkedElement(int index) throws NoSuchElementException {
-        if (size() + 1 < index || index < 0) { //TODO
+        if (size() + 1 < index || index < 0 || isEmpty()) {
             throw new NoSuchElementException();
         }
 
@@ -84,32 +79,32 @@ public class OneWayLinkedList<T> implements IList<T> {
             }
             currentIndex++;
             currentElement = currentElement.next;
-
         }
 
         return null;
     }
 
+    private void invokeForAllElements(Procedure2Args<LinkedElement<T>, Integer> callback) {
+        goToElementByCallBack(((linkedElement, index) -> {
+            callback.apply(linkedElement, index);
+            return false;
+        }));
+    }
+
     @Override
     public void set(int index, T value) throws NoSuchElementException {
-        LinkedElement<T> newElement = new LinkedElement<T>(value);
-
-        if (index == 0 && !isEmpty()) {
-            newElement.next = first.next;
-            first = newElement;
+        if (index == 0) {
+            first.element = value;
         } else {
-            LinkedElement<T> prevElement = getLinkedElement(index - 1);
-            LinkedElement<T> currentElement = prevElement.next;
-            newElement.next = currentElement.next;
-            prevElement.next = newElement;
+            getLinkedElement(index).element = value;
         }
     }
 
     @Override
     public int indexOf(T value) {
         AtomicInteger index = new AtomicInteger(-1);
-        LinkedElement<T> element = goToElementByCallBack((linkedElement, currentIndex) -> {
-            if(linkedElement.element == value) {
+        goToElementByCallBack((linkedElement, currentIndex) -> {
+            if (linkedElement.element == value) {
                 index.set(currentIndex);
                 return true;
             }
@@ -126,12 +121,35 @@ public class OneWayLinkedList<T> implements IList<T> {
 
     @Override
     public T removeAt(int index) throws NoSuchElementException {
-        return null; //TODO
+        if (size() <= 0) {
+            throw new NoSuchElementException();
+        }
+
+        LinkedElement<T> deletedElement;
+        if (index == 0 && size() == 1) {
+            deletedElement = first;
+            first = null;
+        } else if (index == 0) {
+            deletedElement = first;
+            first = first.next;
+        } else {
+            LinkedElement<T> prevElement = getLinkedElement(index - 1);
+            deletedElement = prevElement.next;
+            prevElement.next = prevElement.next.next;
+        }
+
+        length--;
+        return deletedElement.element;
     }
 
     @Override
     public boolean remove(T value) {
-        return false; //TODO
+        try {
+            removeAt(indexOf(value));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -142,20 +160,14 @@ public class OneWayLinkedList<T> implements IList<T> {
     public int countSize() {
         AtomicInteger counter = new AtomicInteger(-1);
 
-        goToElementByCallBack(((linkedElement, index) -> {
-            counter.set(index);
-            return false;
-        }));
+        invokeForAllElements(((linkedElement, index) -> counter.set(index)));
 
-        return counter.get() == -1 ? 0 : counter.get() + 1;
+        return counter.get() + 1;
     }
 
     @Override
     public void print() {
-        goToElementByCallBack(((linkedElement, index) -> {
-            System.out.printf("%2d %10s\n", index, linkedElement);
-            return false;
-        }));
+        invokeForAllElements(((linkedElement, index) -> System.out.printf("%2d %10s\n", index, linkedElement)));
     }
 
     @Override
@@ -164,7 +176,7 @@ public class OneWayLinkedList<T> implements IList<T> {
     }
 
     private static class LinkedElement<E> {
-        private final E element;
+        private E element;
         private LinkedElement<E> next;
 
         public LinkedElement(E element) {
@@ -173,14 +185,27 @@ public class OneWayLinkedList<T> implements IList<T> {
     }
 
     private class OneWayLinkedListIterator implements Iterator<T> {
+        private LinkedElement<T> currentElement;
+
+        public OneWayLinkedListIterator() {
+            this.currentElement = first;
+        }
+
         @Override
         public boolean hasNext() {
-            return false;
+            return !Objects.isNull(currentElement);
         }
 
         @Override
         public T next() {
-            return null;
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            T output = currentElement.element;
+            currentElement = currentElement.next;
+
+            return output;
         }
     }
 

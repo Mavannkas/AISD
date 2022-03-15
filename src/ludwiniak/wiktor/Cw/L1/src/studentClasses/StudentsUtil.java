@@ -3,7 +3,11 @@ package ludwiniak.wiktor.Cw.L1.src.studentClasses;
 import java.util.Iterator;
 
 public class StudentsUtil {
+
     private final StudentsList<Student> students;
+    public StudentsList<Student> getStudents() {
+        return students;
+    }
 
     public StudentsUtil(StudentsList<Student> students) {
         this.students = students;

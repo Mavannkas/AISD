@@ -167,7 +167,7 @@ public class OneWayLinkedList<T> implements IList<T>, Iterable<T> {
 
     @Override
     public void print() {
-        invokeForAllElements(((linkedElement, index) -> System.out.printf("%2d %10s\n", index, linkedElement)));
+        invokeForAllElements(((linkedElement, index) -> System.out.printf("%2d %10s\n", index, linkedElement.element)));
     }
 
     @Override

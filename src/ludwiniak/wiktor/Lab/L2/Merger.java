@@ -12,7 +12,6 @@ public class Merger {
         copyElementsFrom(list2);
         sortList();
         return mergeList;
-
     }
 
     private static void sortList() {

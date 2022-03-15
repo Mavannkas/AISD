@@ -1,12 +1,21 @@
 package ludwiniak.wiktor.Cw.L1.src.studentClasses;
 
 
-public class Student implements WithValue{
+import java.util.Objects;
+
+public class Student implements WithValue, Comparable{
     private final int id;
     private final String name;
     private final String surname;
     private double mark = -0;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return id == student.id && Double.compare(student.mark, mark) == 0 && Objects.equals(name, student.name) && Objects.equals(surname, student.surname);
+    }
 
     public Student(int id, String name, String surname) {
         this.id = id;
@@ -42,5 +51,11 @@ public class Student implements WithValue{
     @Override
     public double getValue() {
         return getMark();
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        Student student = (Student) o;
+        return (int) (mark - student.mark);
     }
 }

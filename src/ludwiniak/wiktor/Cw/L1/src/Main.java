@@ -1,14 +1,21 @@
 package ludwiniak.wiktor.Cw.L1.src;
 
+import ludwiniak.wiktor.Cw.L1.src.studentClasses.Ex3.Ex3;
 import ludwiniak.wiktor.Cw.L1.src.studentClasses.Student;
 import ludwiniak.wiktor.Cw.L1.src.studentClasses.StudentsList;
+import ludwiniak.wiktor.Cw.L1.src.studentClasses.StudentsListIterator;
 import ludwiniak.wiktor.Cw.L1.src.studentClasses.StudentsUtil;
 import ludwiniak.wiktor.Cw.L1.src.studentClasses.v2.StudentV2;
 import ludwiniak.wiktor.Cw.L1.src.studentClasses.v2.StudentsUtilV2;
 
 public class Main {
     public static void main(String[] args) {
-        test2();
+//        FibonacciIterator iterator = new FibonacciIterator(50);
+//        while (iterator.hasNext()) {
+//            int i = iterator.next();
+//            System.out.println(i);
+//        }
+        test3();
     }
 
     private static void test1() {
@@ -41,6 +48,23 @@ public class Main {
         studentsUtil.printBadStudents();
     }
 
+    private static void test3() {
+        Student[] students = getStudents();
+        StudentsList<Student> studentsList = new StudentsList<Student>(students);
+        StudentsUtil studentsUtil = new StudentsUtil(studentsList);
+        studentsUtil.setMarkById(0, 4);
+        studentsUtil.setMarkById(1, 3.5);
+        studentsUtil.setMarkById(2, 6);
+        studentsUtil.setMarkById(3, 2);
+        studentsUtil.setMarkById(4, 2.5);
+        StudentsListIterator<Student> studentStudentsListIterator = (StudentsListIterator<Student>) studentsList.iterator();
+        System.out.println(1);
+        printIterator((StudentsListIterator<Student>) studentsList.iterator());
+        System.out.println(2);
+        printIterator(Ex3.sort((StudentsListIterator<Student>) studentsList.iterator()));
+
+    }
+
     private static Student[] getStudents() {
         return new Student[] {
             new Student(0, "Adam", "Goza"),
@@ -59,5 +83,13 @@ public class Main {
             new StudentV2(3, "Jan", "Goza"),
             new StudentV2(4, "Janusz", "Goza")
         };
+    }
+
+    private static void printIterator(StudentsListIterator<Student> students) {
+        while (students.hasNext()) {
+            Student student = students.next();
+            System.out.println(student);
+
+        }
     }
 }

@@ -1,11 +1,12 @@
 package ludwiniak.wiktor.Lab.L3;
 
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
         boolean continueExecution = true;
 
@@ -32,6 +33,7 @@ public class Main {
                     case "removeat": System.out.println(list.removeAt(Integer.parseInt(arguments[1]))); break;
                     case "size": System.out.println(list.size()); break;
                     case "print": list.print(); break;
+                    case "save": list.save(); break;
                     default: System.out.println("Unknown command: " + arguments[0]);
                 }
             }

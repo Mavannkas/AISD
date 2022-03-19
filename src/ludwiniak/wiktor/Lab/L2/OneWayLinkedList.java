@@ -175,6 +175,10 @@ public class OneWayLinkedList<T> implements IList<T>, Iterable<T> {
         return new OneWayLinkedListIterator();
     }
 
+    public Iterator<T> endlessIterator() {
+        return new EndlessIterator();
+    }
+
     private static class LinkedElement<E> {
         private E element;
         private LinkedElement<E> next;
@@ -204,6 +208,34 @@ public class OneWayLinkedList<T> implements IList<T>, Iterable<T> {
 
             T output = currentElement.element;
             currentElement = currentElement.next;
+
+            return output;
+        }
+    }
+
+    private class EndlessIterator implements Iterator<T> {
+        private LinkedElement<T> currentElement;
+
+        public EndlessIterator() {
+            this.currentElement = first;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !Objects.isNull(currentElement);
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            T output = currentElement.element;
+            currentElement = currentElement.next;
+            if (Objects.isNull(currentElement)) {
+                currentElement = first;
+            }
 
             return output;
         }

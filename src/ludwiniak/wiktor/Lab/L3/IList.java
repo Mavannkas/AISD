@@ -1,5 +1,6 @@
 package ludwiniak.wiktor.Lab.L3;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -16,5 +17,6 @@ public interface IList<T> extends Iterable<T> {
     boolean remove(T value);
     int size();
     void print();
+    void save() throws IOException;
     Iterator<T> iterator();
 }

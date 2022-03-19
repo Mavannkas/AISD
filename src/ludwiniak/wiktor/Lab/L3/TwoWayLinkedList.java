@@ -2,12 +2,17 @@ package ludwiniak.wiktor.Lab.L3;
 
 import ludwiniak.wiktor.Lab.L2.helpers.Function2Args;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TwoWayLinkedList<T> implements IList<T> {
+public class TwoWayLinkedList<T> implements IList<T>, Serializable {
+    private static final long serialVersionUID = 1L;
     private LinkedElement<T> head;
     private LinkedElement<T> tail;
     private int length = 0;
@@ -174,6 +179,20 @@ public class TwoWayLinkedList<T> implements IList<T> {
         return true;
     }
 
+    public boolean removeAll(T value) {
+        int i = 0;
+        while (remove(value)) {i++;}
+        return i != 0;
+    }
+
+    public void save() throws IOException {
+        FileOutputStream fos = new FileOutputStream("foo.txt");
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(this);
+        oos.close();
+    }
+
+
     @Override
     public int size() {
         return length;
@@ -181,7 +200,11 @@ public class TwoWayLinkedList<T> implements IList<T> {
 
     @Override
     public void print() {
-        // TODO: Zaimplementuj wypisanie zawartości listy do konsoli
+        goToElementByCallBackForward((linkedElement, index) -> {
+            System.out.printf("%2d %10s\n", index, linkedElement.element);
+            return false;
+        });
+
     }
 
     @Override
@@ -219,7 +242,8 @@ public class TwoWayLinkedList<T> implements IList<T> {
         return null;
     }
 
-    private static class LinkedElement<E> {
+    private static class LinkedElement<E> implements Serializable {
+        private static final long serialVersionUID = 2L;
         private E element;
         private LinkedElement<E> next;
         private LinkedElement<E> prev;

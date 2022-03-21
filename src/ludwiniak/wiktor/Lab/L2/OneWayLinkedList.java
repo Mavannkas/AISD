@@ -14,6 +14,17 @@ public class OneWayLinkedList<T> implements IList<T>, Iterable<T> {
     private LinkedElement<T> first;
     private int length = 0;
 
+    public LinkedElement<T> getFirst() {
+        return first;
+    }
+
+    public OneWayLinkedList() {
+    }
+
+    public OneWayLinkedList(LinkedElement<T> first) {
+        this.first = first;
+    }
+
     @Override
     public void add(T value) {
         LinkedElement<T> newElement = new LinkedElement<>(value);
@@ -177,15 +188,6 @@ public class OneWayLinkedList<T> implements IList<T>, Iterable<T> {
 
     public Iterator<T> endlessIterator() {
         return new EndlessIterator();
-    }
-
-    private static class LinkedElement<E> {
-        private E element;
-        private LinkedElement<E> next;
-
-        public LinkedElement(E element) {
-            this.element = element;
-        }
     }
 
     private class OneWayLinkedListIterator implements Iterator<T> {

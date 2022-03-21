@@ -9,15 +9,18 @@ public class Inserter {
             int beforeIndex) throws NoSuchElementException {
         TwoWayLinkedList<String> output = new TwoWayLinkedList<>();
         int i = beforeIndex;
+
         for(String item : list1) {
             output.add(item);
         }
+
         for(String item : list2) {
             output.addAt(i++, item);
         }
 
 
         return output;
+
     }
 
     public static TwoWayLinkedList<String> insert(

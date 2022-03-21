@@ -17,6 +17,22 @@ public class TwoWayLinkedList<T> implements IList<T>, Serializable {
     private LinkedElement<T> tail;
     private int length = 0;
 
+    public TwoWayLinkedList() {
+
+    }
+
+    public TwoWayLinkedList(LinkedElement<T> head) {
+        this.head = head;
+    }
+
+    public LinkedElement<T> getHead() {
+        return head;
+    }
+
+    public LinkedElement<T> getTail() {
+        return tail;
+    }
+
     @Override
     public void add(T value) {
         LinkedElement<T> newElement = new LinkedElement<>(value);
@@ -242,11 +258,11 @@ public class TwoWayLinkedList<T> implements IList<T>, Serializable {
         return null;
     }
 
-    private static class LinkedElement<E> implements Serializable {
+    public static class LinkedElement<E> implements Serializable {
         private static final long serialVersionUID = 2L;
-        private E element;
-        private LinkedElement<E> next;
-        private LinkedElement<E> prev;
+        public E element;
+        public LinkedElement<E> next;
+        public LinkedElement<E> prev;
 
         public LinkedElement(E element) {
             this.element = element;

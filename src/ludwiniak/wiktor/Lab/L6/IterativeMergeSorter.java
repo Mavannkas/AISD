@@ -62,9 +62,4 @@ public class IterativeMergeSorter implements ISorter {
 
         return output;
     }
-
-
-//    private void copyArrayToArrayInRange(int[] mergedArray, int[] values, int startIndex, int step) {
-//        if (step >= 0)
-//    }
 }

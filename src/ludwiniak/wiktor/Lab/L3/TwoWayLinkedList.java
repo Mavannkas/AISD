@@ -125,7 +125,7 @@ public class TwoWayLinkedList<T> implements IList<T>, Serializable {
     public int indexOf(T value) {
         AtomicInteger index = new AtomicInteger(-1);
         goToElementByCallBackForward((linkedElement, currentIndex) -> {
-            if (linkedElement.element == value) {
+            if (linkedElement.element.equals(value)) {
                 index.set(currentIndex);
                 return true;
             }

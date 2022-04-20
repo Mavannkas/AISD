@@ -1,23 +1,20 @@
 package ludwiniak.wiktor.Lab.L7;
 
 import ludwiniak.wiktor.Lab.L4.TwoWayLinkedList;
-import org.junit.platform.commons.util.CollectionUtils;
 
-import java.lang.reflect.Array;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 public class HashMap<TKey, TValue> {
     private final int initialSize;
+    private final double loadFactor;
+    private final Function<TKey, Integer> hashFunction;
     private int size;
-    private double loadFactor;
     private int elementsCount = 0;
-    private Function<TKey, Integer> hashFunction;
-
     private TwoWayLinkedList<Entry<TKey, TValue>>[] array;
 
-//    @SuppressWarnings("unchecked")
     public HashMap(int initialSize, double loadFactor, Function<TKey, Integer> hashFunction) {
         this.initialSize = initialSize;
         this.size = initialSize;
@@ -28,30 +25,22 @@ public class HashMap<TKey, TValue> {
     }
 
     public void add(TKey key, TValue value) throws DuplicateKeyException {
-        TwoWayLinkedList<Entry<TKey, TValue>> entries = getEntries(key);
-        Entry<TKey, TValue> entry= new Entry<>(key, value);
+        TwoWayLinkedList<Entry<TKey, TValue>> entries = getNonNullEntries(key);
+        Entry<TKey, TValue> entry = new Entry<>(key, value);
 
-        if(entries == null) {
-            entries = new TwoWayLinkedList<>();
-            array[hashFunction.apply(key) % size] = entries;
-        }
-
-        if(entries.contains(entry)) {
+        if (entries.contains(entry)) {
             throw new DuplicateKeyException();
         }
 
-        elementsCount++;
-        entries.add(entry);
-        tryToResize();
+        addEntryToList(entry, entries);
     }
 
     private void tryToResize() {
-        if(elementsCount / (double)size >= loadFactor) {
+        if (elementsCount / (double) size >= loadFactor) {
             changeSize();
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void clear() {
         elementsCount = 0;
         size = initialSize;
@@ -59,29 +48,25 @@ public class HashMap<TKey, TValue> {
     }
 
     public boolean containsKey(TKey key) {
-        for(TwoWayLinkedList<Entry<TKey, TValue>> values : array) {
-            if(values != null) {
-                for(Entry<TKey, TValue> entryValue: values) {
-                    if(entryValue.key.equals(key)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return contains((entry) -> entry.key.equals(key));
     }
 
     public boolean containsValue(TValue value) {
-        for(TwoWayLinkedList<Entry<TKey, TValue>> values : array) {
-            if(values != null) {
-                for(Entry<TKey, TValue> entryValue: values) {
-                    if(entryValue.value.equals(value)) {
-                        return true;
-                    }
-                }
+        return contains((entry) -> entry.value.equals(value));
+    }
+
+    private boolean contains(Function<Entry<TKey, TValue>, Boolean> callback) {
+        AtomicBoolean output = new AtomicBoolean(false);
+        iterateByElements((entry)->{
+            if (callback.apply(entry)) {
+                output.set(true);
+                return true;
             }
-        }
-        return false;
+
+            return false;
+        });
+
+        return output.get();
     }
 
     public int elements() {
@@ -90,44 +75,56 @@ public class HashMap<TKey, TValue> {
 
     public TValue get(TKey key) throws NoSuchElementException {
         TwoWayLinkedList<Entry<TKey, TValue>> entries = getEntries(key);
-        if(entries == null) {
+        if (entries == null) {
             throw new NoSuchElementException();
         }
-        for(Entry<TKey, TValue> entry: entries) {
-            if(entry.key.equals(key)) {
+
+        for (Entry<TKey, TValue> entry : entries) {
+            if (entry.key.equals(key)) {
                 return entry.value;
             }
         }
+
         throw new NoSuchElementException();
     }
 
     public void put(TKey key, TValue value) {
-        TwoWayLinkedList<Entry<TKey, TValue>> entries = getEntries(key);
-        Entry<TKey, TValue> entry= new Entry<>(key, value);
+        TwoWayLinkedList<Entry<TKey, TValue>> entries = getNonNullEntries(key);
+        Entry<TKey, TValue> entry = new Entry<>(key, value);
 
-        if(entries == null) {
+        int elementIndex = entries.indexOf(entry);
+        if (elementIndex != -1) {
+            entries.get(elementIndex).value = value;
+        } else {
+            addEntryToList(entry, entries);
+        }
+    }
+
+    private void addEntryToList(Entry<TKey, TValue> entry, TwoWayLinkedList<Entry<TKey, TValue>> list) {
+        elementsCount++;
+        list.add(entry);
+        tryToResize();
+    }
+
+    private TwoWayLinkedList<Entry<TKey, TValue>> getNonNullEntries(TKey key) {
+        TwoWayLinkedList<Entry<TKey, TValue>> entries = getEntries(key);
+
+        if (entries == null) {
             entries = new TwoWayLinkedList<>();
             array[hashFunction.apply(key) % size] = entries;
         }
 
-        int elementIndex = entries.indexOf(entry);
-        if(elementIndex != -1) {
-            entries.get(elementIndex).value = value;
-        } else {
-            elementsCount++;
-            entries.add(entry);
-            tryToResize();
-        }
+        return entries;
     }
 
     public TValue remove(TKey key) {
         TwoWayLinkedList<Entry<TKey, TValue>> entries = getEntries(key);
-        if(entries == null) {
+        if (entries == null) {
             return null;
         }
 
-        for(Entry<TKey, TValue> entry: entries) {
-            if(entry.key.equals(key)) {
+        for (Entry<TKey, TValue> entry : entries) {
+            if (entry.key.equals(key)) {
                 elementsCount--;
                 entries.remove(entry);
                 return entry.value;
@@ -148,22 +145,27 @@ public class HashMap<TKey, TValue> {
         size *= 2;
         HashMap<TKey, TValue> newHashMap = new HashMap<>(size, loadFactor, hashFunction);
 
-        for(TwoWayLinkedList<Entry<TKey, TValue>> values : array) {
-            if(values != null) {
-                for(Entry<TKey, TValue> value:  (values)) {
-                    try {
-                        newHashMap.add(value.getKey(), value.getValue());
-                    } catch (DuplicateKeyException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
+        iterateByElements((value) -> {
+            newHashMap.put(value.getKey(), value.getValue());
+            return false;
+        });
 
         array = newHashMap.array;
     }
 
-    private class Entry<K, V> {
+    private void iterateByElements(Function<Entry<TKey, TValue>, Boolean> callback) {
+        for (TwoWayLinkedList<Entry<TKey, TValue>> values : array) {
+            if (values != null) {
+                for (Entry<TKey, TValue> value : (values)) {
+                    if(callback.apply(value)) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private static class Entry<K, V> {
         private final K key;
         private V value;
 

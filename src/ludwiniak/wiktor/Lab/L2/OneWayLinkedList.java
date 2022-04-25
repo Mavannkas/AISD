@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 public class OneWayLinkedList<T> implements IList<T>, Iterable<T> {
-    private LinkedElement<T> first;
+    public LinkedElement<T> first;
     private int length = 0;
 
     public LinkedElement<T> getFirst() {

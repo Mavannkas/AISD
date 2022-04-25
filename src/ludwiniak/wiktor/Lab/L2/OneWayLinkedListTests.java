@@ -232,6 +232,21 @@ public class OneWayLinkedListTests {
     }
 
     @org.junit.jupiter.api.Test
+    void testRec() {
+        OneWayLinkedList<Integer> list = new OneWayLinkedList<>();
+        list.add(3);
+        list.add(2);
+        list.add(4);
+        list.add(1);
+
+        System.out.println(RecMethods.findSmallestNumber(list.first));
+//        RecMethods.printValueFromEnd(list.first);
+
+        System.out.println();
+        //assertEquals(2, list.size());
+    }
+
+    @org.junit.jupiter.api.Test
     void iterator() {
         list.add("a");
         list.add("b");

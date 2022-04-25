@@ -10,7 +10,7 @@ import java.util.function.Function;
 public class HashMap<TKey, TValue> {
     private final int initialSize;
     private final double loadFactor;
-    private final Function<TKey, Integer> hashFunction;
+    private Function<TKey, Integer> hashFunction;
     private int size;
     private int elementsCount = 0;
     private TwoWayLinkedList<Entry<TKey, TValue>>[] array;
@@ -37,7 +37,8 @@ public class HashMap<TKey, TValue> {
 
     private void tryToResize() {
         if (elementsCount / (double) size >= loadFactor) {
-            changeSize();
+            size *= 2;
+            rebuild();
         }
     }
 
@@ -141,8 +142,7 @@ public class HashMap<TKey, TValue> {
         return array[hashFunction.apply(key) % size];
     }
 
-    private void changeSize() {
-        size *= 2;
+    private void rebuild() {
         HashMap<TKey, TValue> newHashMap = new HashMap<>(size, loadFactor, hashFunction);
 
         iterateByElements((value) -> {
@@ -163,6 +163,11 @@ public class HashMap<TKey, TValue> {
                 }
             }
         }
+    }
+
+    public void rehash(Function<TKey, Integer> newHashFunction) {
+        this.hashFunction = newHashFunction;
+        rebuild();
     }
 
     private static class Entry<K, V> {

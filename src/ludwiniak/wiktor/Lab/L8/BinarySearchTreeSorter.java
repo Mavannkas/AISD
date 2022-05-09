@@ -1,0 +1,16 @@
+package ludwiniak.wiktor.Lab.L8;
+
+import java.util.List;
+
+public class BinarySearchTreeSorter {
+    public static <T extends Comparable<T>> void sort(List<T> list) throws DuplicateElementException {
+        BinarySearchTree<T> tree = new BinarySearchTree<>();
+
+        for(T element: list) {
+            tree.add(element);
+        }
+
+        list.clear();
+        list.addAll(tree.inOrder());
+    }
+}

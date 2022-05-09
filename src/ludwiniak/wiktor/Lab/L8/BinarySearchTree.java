@@ -1,13 +1,14 @@
 package ludwiniak.wiktor.Lab.L8;
 
 import java.util.ArrayList;
-import java.util.Objects;
+
+import static java.util.Objects.isNull;
 
 public class BinarySearchTree<T extends Comparable<T>> {
     TreeNode<T> root;
 
     public void add(T value) throws DuplicateElementException {
-        if (Objects.isNull(root)) {
+        if (isNull(root)) {
             root = new TreeNode<>(value);
         } else {
             add(root, value);
@@ -15,12 +16,12 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     private void add(TreeNode<T> node, T value) throws DuplicateElementException {
-        if (value.equals(node.value)) {
+        if (value.compareTo(node.value) == 0) {
             throw new DuplicateElementException();
         }
 
         if (value.compareTo(node.value) < 0) {
-            if (Objects.isNull(node.left)) {
+            if (isNull(node.left)) {
                 node.left = new TreeNode<>(value);
                 return;
             }
@@ -28,7 +29,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
             return;
         }
 
-        if (Objects.isNull(node.right)) {
+        if (isNull(node.right)) {
             node.right = new TreeNode<>(value);
             return;
         }
@@ -40,18 +41,18 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     private boolean contains(T value, TreeNode<T> node) {
-        if (Objects.isNull(node)) {
+        if (isNull(node)) {
             return false;
         }
 
         int result = value.compareTo(node.value);
 
-        if (result < 0) {
-            return contains(value, node.left);
-        }
-
         if (result > 0) {
             return contains(value, node.right);
+        }
+
+        if (result < 0) {
+            return contains(value, node.left);
         }
 
         return true;
@@ -62,7 +63,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     private TreeNode<T> delete(T value, TreeNode<T> node) {
-        if (Objects.isNull(node)) {
+        if (isNull(node)) {
             return null;
         }
 
@@ -73,12 +74,12 @@ public class BinarySearchTree<T extends Comparable<T>> {
         } else if (result > 0) {
             node.right = delete(value, node.right);
         } else {
-            if (Objects.isNull(node.right)) {
-                return node.left;
+            if (isNull(node.left)) {
+                return node.right;
             }
 
-            if (Objects.isNull(node.left)) {
-                return node.right;
+            if (isNull(node.right)) {
+                return node.left;
             }
 
             node.value = min(node.right);
@@ -102,7 +103,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     private void preOrder(TreeNode<T> node, ArrayList<String> output) {
-        if (Objects.isNull(node)) {
+        if (isNull(node)) {
             return;
         }
 
@@ -114,18 +115,35 @@ public class BinarySearchTree<T extends Comparable<T>> {
 
     public String toStringInOrder() {
         ArrayList<String> output = new ArrayList<>();
-        inOrder(root, output);
+        toStringInOrder(root, output);
         return String.join(", ", output);
     }
 
-    private void inOrder(TreeNode<T> node, ArrayList<String> output) {
-        if (Objects.isNull(node)) {
+    public ArrayList<T> inOrder() {
+        ArrayList<T> output = new ArrayList<>();
+        inOrder(root, output);
+        return output;
+    }
+
+    private void inOrder(TreeNode<T> node, ArrayList<T> output) {
+        if (isNull(node)) {
             return;
         }
 
         inOrder(node.left, output);
-        output.add(node.value.toString());
+        output.add(node.value);
         inOrder(node.right, output);
+
+    }
+
+    private void toStringInOrder(TreeNode<T> node, ArrayList<String> output) {
+        if (isNull(node)) {
+            return;
+        }
+
+        toStringInOrder(node.left, output);
+        output.add(node.value.toString());
+        toStringInOrder(node.right, output);
 
     }
 
@@ -136,7 +154,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     private void postOrder(TreeNode<T> node, ArrayList<String> output) {
-        if (Objects.isNull(node)) {
+        if (isNull(node)) {
             return;
         }
 
@@ -146,7 +164,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
 
     }
 
-    private class TreeNode<T> {
+    private static class TreeNode<T> {
         T value;
         TreeNode<T> left;
         TreeNode<T> right;

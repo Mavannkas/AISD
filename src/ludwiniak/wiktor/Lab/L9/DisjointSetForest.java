@@ -16,7 +16,7 @@ public class DisjointSetForest implements IDisjointSetStructure {
 
     @Override
     public int findSet(int item) throws ItemOutOfRangeException {
-        if(item >= p.length || item < 0) {
+        if (item >= p.length || item < 0) {
             throw new ItemOutOfRangeException();
         }
         if (item != p[item]) {
@@ -33,11 +33,11 @@ public class DisjointSetForest implements IDisjointSetStructure {
     private void link(int item1, int item2) {
         if (rank[item1] > rank[item2]) {
             p[item2] = item1;
-        } else {
-            p[item1] = item2;
-            if (rank[item1] == rank[item2]) {
-                rank[item2] = rank[item2] + 1;
-            }
+            return;
+        }
+        p[item1] = item2;
+        if (rank[item1] == rank[item2]) {
+            rank[item2] = rank[item2] + 1;
         }
     }
 }

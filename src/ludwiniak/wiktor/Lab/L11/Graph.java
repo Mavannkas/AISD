@@ -3,8 +3,9 @@ package ludwiniak.wiktor.Lab.L11;
 import java.util.*;
 
 public class Graph<T> {
-    private final Map<T, Integer> nodes = new HashMap();
+    private final Map<T, Integer> nodes = new HashMap<>();
     private final List<List<Integer>> distances = new LinkedList<>();
+    private final Map<T, Map<T, Integer>> cache = new HashMap<>();
 
     public Graph(List<Edge<T>> edges) {
         getNodes(edges);
@@ -43,6 +44,10 @@ public class Graph<T> {
             throw new NoSuchElementException("There is no such node in graph");
         }
 
+        if (cache.containsKey(startNode)) {
+            return cache.get(startNode);
+        }
+
         int startIndex = nodes.get(startNode);
         Map<T, Integer> output = new HashMap<>();
         Map<T, Boolean> visited = new HashMap<>();
@@ -79,6 +84,7 @@ public class Graph<T> {
 
         }
 
+        cache.put(startNode, output);
         return output;
     }
 

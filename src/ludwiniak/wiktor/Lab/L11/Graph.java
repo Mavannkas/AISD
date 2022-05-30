@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Graph<T> {
     private final Map<T, Integer> nodes = new HashMap<>();
-    private final List<List<Integer>> distances = new LinkedList<>();
+    private final List<List<Integer>> distances = new ArrayList<>();
     private final Map<T, Map<T, Integer>> cache = new HashMap<>();
 
     public Graph(List<Edge<T>> edges) {
@@ -40,7 +40,11 @@ public class Graph<T> {
     }
 
     public Map<T, Integer> calculateShortestPaths(T startNode) throws NoSuchElementException {
-        if (!nodes.containsKey(startNode)) {
+        return calculateShortestPaths(startNode, null);
+    }
+
+    public Map<T, Integer> calculateShortestPaths(T startNode, T endNode) throws NoSuchElementException {
+        if (!nodes.containsKey(startNode) || (endNode != null && !nodes.containsKey(endNode))) {
             throw new NoSuchElementException("There is no such node in graph");
         }
 
@@ -68,6 +72,10 @@ public class Graph<T> {
         while (visited.containsValue(false)) {
             T minNode = getMinNode(output, visited);
             visited.put(minNode, true);
+
+            if (minNode.equals(endNode)) {
+                break;
+            }
 
             for (T key : nodes.keySet()) {
                 if (!output.containsKey(key) || visited.get(key)) {
@@ -102,5 +110,8 @@ public class Graph<T> {
         return minNode;
     }
 
+    public Integer calculateShortestPath(T startNode, T endNode) throws NoSuchElementException {
+        return calculateShortestPaths(startNode, endNode).get(endNode);
+    }
 
 }

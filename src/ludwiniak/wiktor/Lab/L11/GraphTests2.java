@@ -31,16 +31,12 @@ public class GraphTests2 {
 
     @Test
     public void calculateShortestPath_startNodeDoesntExist() {
-        assertThrows(NoSuchElementException.class, () -> {
-            graph.calculateShortestPath("z", "c");
-        });
+        assertThrows(NoSuchElementException.class, () -> graph.calculateShortestPath("z", "c"));
     }
 
     @Test
     public void calculateShortestPath_endNodeDoesntExist() {
-        assertThrows(NoSuchElementException.class, () -> {
-            graph.calculateShortestPath("a", "x");
-        });
+        assertThrows(NoSuchElementException.class, () -> graph.calculateShortestPath("a", "x"));
     }
 
     @BeforeEach

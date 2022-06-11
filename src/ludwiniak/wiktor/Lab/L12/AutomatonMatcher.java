@@ -5,13 +5,13 @@ import java.util.*;
 public class AutomatonMatcher implements IStringMatcher {
     @Override
     public List<Integer> validShifts(String textToSearch, String patternToFind) {
-        Set<Character> alphabet = getAlphabet(patternToFind + textToSearch);
+        Set<Character> alphabet = getAlphabet(textToSearch);
         Map<Integer, Map<Character, Integer>> transitions = buildTransitions(patternToFind, alphabet);
         return findMatches(textToSearch, transitions, patternToFind.length());
     }
 
     private List<Integer> findMatches(String textToSearch, Map<Integer, Map<Character, Integer>> transitions, int length) {
-        List<Integer> matches = new ArrayList<>();
+        List<Integer> matches = new LinkedList<>();
         int currentState = 0;
         for (int i = 0; i < textToSearch.length(); i++) {
             currentState = transitions.get(currentState).get(textToSearch.charAt(i));
